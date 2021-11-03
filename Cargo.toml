@@ -1,0 +1,21 @@
+[package]
+name = "libzbase32"
+version = "1.0.0"
+edition = "2018"
+authors = ["Palmer Cox <p@lmercox.com>"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/DaGenix/libzbase32"
+documentation = "https://docs.rs/libzbase32"
+homepage = "https://github.com/DaGenix/libzbase32"
+description = """
+An implementation of the z-base-32 format for Rust. This implementation
+is no_std compatible.
+"""
+categories = ["encoding"]
+
+[dependencies]
+
+[features]
+default = ["std"]
+std = []
