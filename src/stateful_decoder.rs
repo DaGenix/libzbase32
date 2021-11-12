@@ -11,6 +11,11 @@ pub enum ProvideQuintetResult {
     HaveOctets(HaveOctets),
 }
 
+pub fn quintet_has_valid_trailing_bits(last_quintet_bits: u8, quintet: u8) -> bool {
+    let trailing_bits_mask = 0x1fu8.checked_shr(last_quintet_bits as u32).unwrap_or(0);
+    quintet & trailing_bits_mask == 0
+}
+
 impl NeedQuintets {
     pub fn new(last_quintet_bits: u8) -> Result<NeedQuintets, ZBase32Error> {
         assert!(last_quintet_bits != 0 && last_quintet_bits <= 5);
@@ -31,10 +36,7 @@ impl NeedQuintets {
         }
 
         if last_quintet {
-            let trailing_bits_mask = 0x1fu8
-                .checked_shr(self.last_quintet_bits as u32)
-                .unwrap_or(0);
-            if quintet & trailing_bits_mask != 0 {
+            if !quintet_has_valid_trailing_bits(self.last_quintet_bits, quintet) {
                 return Err(zbase32_error(ZBase32ErrorInfo::TrailingNonZeroBits));
             }
         }
