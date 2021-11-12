@@ -1,5 +1,8 @@
 use crate::error::{zbase32_error, ZBase32Error, ZBase32ErrorInfo};
-use crate::stateful_decoder::{HaveOctets, NeedQuintets, NextOctetResult, ProvideQuintetResult};
+use crate::stateful_decoder::{
+    quintet_has_valid_trailing_bits, HaveOctets, NeedQuintets, NextOctetResult,
+    ProvideQuintetResult,
+};
 use crate::tables::{CHARACTER_MIN_VALUE, CHARACTER_TO_QUINTET};
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
 use core::iter::Peekable;
@@ -125,6 +128,15 @@ fn calc_last_quintet_bits(bits: u64) -> Option<u8> {
             0 => Some(5),
             x => Some(x as u8),
         }
+    }
+}
+
+/// Determine if the last quintet is, given the number of bits to decode
+pub fn is_last_quintet_valid(bits: u64, quintet: u8) -> bool {
+    if let Some(last_quintet_bits) = calc_last_quintet_bits(bits) {
+        quintet <= 31 && quintet_has_valid_trailing_bits(last_quintet_bits, quintet)
+    } else {
+        false
     }
 }
 

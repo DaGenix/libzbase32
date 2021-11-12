@@ -1,5 +1,7 @@
 use crate::error::{zbase32_error, ZBase32Error, ZBase32ErrorInfo};
-use crate::stateful_encoder::{HaveQuintets, NeedOctets, NextQuintetResult, ProvideOctetResult};
+use crate::stateful_encoder::{
+    octet_has_valid_trailing_bits, HaveQuintets, NeedOctets, NextQuintetResult, ProvideOctetResult,
+};
 use crate::tables::QUINTET_TO_CHARACTER;
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
 use core::iter::Peekable;
@@ -120,6 +122,15 @@ fn calc_last_octet_bits(bits: u64) -> Option<u8> {
             0 => Some(8),
             x => Some(x as u8),
         }
+    }
+}
+
+/// Determine if the last octet is valid, given the number of bits to encode
+pub fn is_last_octet_valid(bits: u64, octet: u8) -> bool {
+    if let Some(last_octet_bits) = calc_last_octet_bits(bits) {
+        octet_has_valid_trailing_bits(last_octet_bits, octet)
+    } else {
+        false
     }
 }
 

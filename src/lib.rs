@@ -134,12 +134,16 @@ pub use encode_impl::encode;
 
 pub mod low_level_decode {
     //! Low-level decoding functionality
-    pub use crate::decode_impl::{character_to_quintet, decode_slices, quintets_to_octets};
+    pub use crate::decode_impl::{
+        character_to_quintet, decode_slices, is_last_quintet_valid, quintets_to_octets,
+    };
     pub use crate::util::required_octets_buffer_len;
 }
 
 pub mod low_level_encode {
     //! Low-level encoding functionality
-    pub use crate::encode_impl::{encode_slices, octets_to_quintets, quintet_to_character};
+    pub use crate::encode_impl::{
+        encode_slices, is_last_octet_valid, octets_to_quintets, quintet_to_character,
+    };
     pub use crate::util::required_quintets_buffer_len;
 }
