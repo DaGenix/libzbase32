@@ -41,12 +41,12 @@
 //! the number of bits specified in the operation, an Error be returned. For example,
 //! encoding a single bit for the input value 0x01 will fail.
 //!
-//! All fallible operations return an Error value of the same type, [`ZBase32Error`].
-//! This is a mostly opaque type. Its single method, [`error_type`](ZBase32Error::error_type)
-//! allows you to differentiate between an error in the input value or an
-//! error in using the interfaces. More information about the cause of the error
-//! can be retrieved by using the [`Debug::fmt`](std::fmt::Debug::fmt) or
-//! [`Display::fmt`](std::fmt::Display::fmt) functions.
+//! Most fallible operations return an Error value of the same type, [`ZBase32Error`].
+//! This is a mostly opaque type that only allows you to differentiate between an
+//! error in the input value or an error in using the interfaces. More information
+//! about the cause of the error can be retrieved by using the
+//! [`Debug::fmt`](std::fmt::Debug::fmt) or [`Display::fmt`](std::fmt::Display::fmt)
+//! functions.
 //!
 //! ## High-level API
 //!
@@ -124,7 +124,7 @@ mod tables;
 mod test_data;
 mod util;
 
-pub use error::{ZBase32Error, ZBase32ErrorType};
+pub use error::{InputErrorCause, UsageError, UsageErrorCause, ZBase32Error};
 
 #[cfg(feature = "std")]
 pub use decode_impl::decode;

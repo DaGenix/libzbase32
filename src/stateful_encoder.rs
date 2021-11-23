@@ -1,4 +1,5 @@
-use crate::error::{zbase32_error, ZBase32Error, ZBase32ErrorInfo};
+use crate::error::trailing_nonzero_bits;
+use crate::ZBase32Error;
 
 pub struct NeedOctets {
     octet_buffer: [u8; 5],
@@ -17,13 +18,15 @@ pub fn octet_has_valid_trailing_bits(last_octet_bits: u8, octet: u8) -> bool {
 }
 
 impl NeedOctets {
-    pub fn new(last_octet_bits: u8) -> Result<NeedOctets, ZBase32Error> {
+    // NOTE: panics if `last_octet_bits` is invalid. This would need to be changed
+    // if this ever became a public API!
+    pub fn new(last_octet_bits: u8) -> NeedOctets {
         assert!(last_octet_bits != 0 && last_octet_bits <= 8);
-        Ok(NeedOctets {
+        NeedOctets {
             octet_buffer: [0u8; 5],
             pos: 0,
             last_octet_bits,
-        })
+        }
     }
 
     pub fn provide_octet(
@@ -33,7 +36,7 @@ impl NeedOctets {
     ) -> Result<ProvideOctetResult, ZBase32Error> {
         if last_octet {
             if !octet_has_valid_trailing_bits(self.last_octet_bits, octet) {
-                return Err(zbase32_error(ZBase32ErrorInfo::TrailingNonZeroBits));
+                return Err(trailing_nonzero_bits());
             }
         }
 

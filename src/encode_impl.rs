@@ -1,9 +1,12 @@
-use crate::error::{zbase32_error, ZBase32Error, ZBase32ErrorInfo};
+use crate::error::{
+    input_buffer_doesnt_match_bits, invalid_quintet, output_buffer_doesnt_match_bits,
+};
 use crate::stateful_encoder::{
     octet_has_valid_trailing_bits, HaveQuintets, NeedOctets, NextQuintetResult, ProvideOctetResult,
 };
 use crate::tables::QUINTET_TO_CHARACTER;
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
+use crate::ZBase32Error;
 use core::iter::Peekable;
 
 enum OctetsToQuintetsIterState {
@@ -109,7 +112,7 @@ where
 /// value (such as "y").
 pub fn quintet_to_character(quintet: u8) -> Result<u8, ZBase32Error> {
     if quintet as usize > QUINTET_TO_CHARACTER.len() {
-        return Err(zbase32_error(ZBase32ErrorInfo::InvalidQuintet));
+        return Err(invalid_quintet());
     }
     Ok(QUINTET_TO_CHARACTER[quintet as usize])
 }
@@ -145,10 +148,10 @@ pub fn octets_to_quintets(
     bits: u64,
 ) -> Result<(), ZBase32Error> {
     if in_octets.len() != required_octets_buffer_len(bits)? {
-        return Err(zbase32_error(ZBase32ErrorInfo::InputBufferDoesntMatchBits));
+        return Err(input_buffer_doesnt_match_bits().into());
     }
     if out_quintets.len() != required_quintets_buffer_len(bits)? {
-        return Err(zbase32_error(ZBase32ErrorInfo::OutputBufferDoesntMatchBits));
+        return Err(output_buffer_doesnt_match_bits().into());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
@@ -158,7 +161,7 @@ pub fn octets_to_quintets(
 
     let quintet_iter = OctetsToQuintetsIter::new(
         in_octets.iter().map(|&x| x),
-        NeedOctets::new(last_octet_bits)?,
+        NeedOctets::new(last_octet_bits),
     );
 
     for (out_quintet, in_quintet) in out_quintets.iter_mut().zip(quintet_iter) {
@@ -189,10 +192,10 @@ pub fn encode_slices(
     bits: u64,
 ) -> Result<(), ZBase32Error> {
     if in_octets.len() != required_octets_buffer_len(bits)? {
-        return Err(zbase32_error(ZBase32ErrorInfo::InputBufferDoesntMatchBits));
+        return Err(input_buffer_doesnt_match_bits().into());
     }
     if out_characters.len() != required_quintets_buffer_len(bits)? {
-        return Err(zbase32_error(ZBase32ErrorInfo::OutputBufferDoesntMatchBits));
+        return Err(output_buffer_doesnt_match_bits().into());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
@@ -202,7 +205,7 @@ pub fn encode_slices(
 
     let quintet_iter = OctetsToQuintetsIter::new(
         in_octets.iter().map(|&x| x),
-        NeedOctets::new(last_octet_bits)?,
+        NeedOctets::new(last_octet_bits),
     );
 
     for (out_quintet, in_quintet) in out_characters.iter_mut().zip(quintet_iter) {
@@ -224,7 +227,7 @@ pub fn encode_slices(
 #[cfg(feature = "std")]
 pub fn encode(input: &[u8], output: &mut String, bits: u64) -> Result<(), ZBase32Error> {
     if input.len() != required_octets_buffer_len(bits)? {
-        return Err(zbase32_error(ZBase32ErrorInfo::InputBufferDoesntMatchBits));
+        return Err(input_buffer_doesnt_match_bits().into());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
@@ -236,7 +239,7 @@ pub fn encode(input: &[u8], output: &mut String, bits: u64) -> Result<(), ZBase3
     output.reserve(needed_quintets);
 
     let quintet_iter =
-        OctetsToQuintetsIter::new(input.iter().map(|&x| x), NeedOctets::new(last_octet_bits)?);
+        OctetsToQuintetsIter::new(input.iter().map(|&x| x), NeedOctets::new(last_octet_bits));
 
     for quintet in quintet_iter {
         output.push(quintet_to_character(quintet?)? as char);

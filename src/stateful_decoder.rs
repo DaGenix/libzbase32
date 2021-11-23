@@ -1,4 +1,5 @@
-use crate::error::{zbase32_error, ZBase32Error, ZBase32ErrorInfo};
+use crate::error::{invalid_quintet, trailing_nonzero_bits};
+use crate::ZBase32Error;
 
 pub struct NeedQuintets {
     quintet_buffer: [u8; 8],
@@ -17,13 +18,15 @@ pub fn quintet_has_valid_trailing_bits(last_quintet_bits: u8, quintet: u8) -> bo
 }
 
 impl NeedQuintets {
-    pub fn new(last_quintet_bits: u8) -> Result<NeedQuintets, ZBase32Error> {
+    // NOTE: panics if `last_quintet_bits` is invalid. This would need to be changed
+    // if this ever became a public API!
+    pub fn new(last_quintet_bits: u8) -> NeedQuintets {
         assert!(last_quintet_bits != 0 && last_quintet_bits <= 5);
-        Ok(NeedQuintets {
+        NeedQuintets {
             quintet_buffer: [0u8; 8],
             pos: 0,
             last_quintet_bits,
-        })
+        }
     }
 
     pub fn provide_quintet(
@@ -32,12 +35,12 @@ impl NeedQuintets {
         last_quintet: bool,
     ) -> Result<ProvideQuintetResult, ZBase32Error> {
         if quintet > 31 {
-            return Err(zbase32_error(ZBase32ErrorInfo::InvalidQuintet));
+            return Err(invalid_quintet());
         }
 
         if last_quintet {
             if !quintet_has_valid_trailing_bits(self.last_quintet_bits, quintet) {
-                return Err(zbase32_error(ZBase32ErrorInfo::TrailingNonZeroBits));
+                return Err(trailing_nonzero_bits());
             }
         }
 
