@@ -18,7 +18,7 @@ const fn u64_to_usize(val: u64) -> Option<usize> {
 /// Calculate the number of octets that are required to hold the specified
 /// number of bits.
 ///
-/// This function ill return an Err value if the specified number of bits
+/// This function will return an Err value if the specified number of bits
 /// would result in needing more than [`usize::MAX`] octets.
 pub const fn required_octets_buffer_len(bits: u64) -> Result<usize, ZBase32Error> {
     let remainder = bits % 8;
@@ -33,7 +33,7 @@ pub const fn required_octets_buffer_len(bits: u64) -> Result<usize, ZBase32Error
 /// Calculate the number of quintets tht are required to hold the specified
 /// number of bits.
 ///
-/// This function ill return an Err value if the specified number of bits
+/// This function will return an Err value if the specified number of bits
 /// would result in needing more than [`usize::MAX`] quintets.
 pub const fn required_quintets_buffer_len(bits: u64) -> Result<usize, ZBase32Error> {
     let remainder = bits % 5;
