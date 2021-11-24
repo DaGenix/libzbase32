@@ -1,3 +1,10 @@
+2.0.0
+=====
+
+* Rework the Error interfaces to make it easier to differentiate
+  between errors related to bad input and errors related to incorrect
+  usage.
+
 1.1.0
 =====
 
