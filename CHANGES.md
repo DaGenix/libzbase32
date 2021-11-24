@@ -1,3 +1,8 @@
+2.0.1
+=====
+
+* Fix imports to make no_std mode actually work.
+
 2.0.0
 =====
 
