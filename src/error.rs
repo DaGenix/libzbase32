@@ -84,7 +84,7 @@ pub enum ZBase32Error {
 }
 
 impl Debug for ZBase32Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
             ZBase32Error::InputError(cause) => write!(f, "Input Error: {}", cause),
             ZBase32Error::UsageError(cause) => write!(f, "Usage Error: {}", cause),
@@ -93,7 +93,7 @@ impl Debug for ZBase32Error {
 }
 
 impl Display for ZBase32Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         Debug::fmt(self, f)
     }
 }
@@ -115,13 +115,13 @@ impl From<UsageError> for ZBase32Error {
 pub struct UsageError(pub UsageErrorCause);
 
 impl Debug for UsageError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         write!(f, "Usage Error: {}", self.0)
     }
 }
 
 impl Display for UsageError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         Debug::fmt(self, f)
     }
 }
