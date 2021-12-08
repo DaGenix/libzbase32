@@ -1,4 +1,4 @@
-use crate::error::trailing_nonzero_bits;
+use crate::error::encoding_trailing_nonzero_bits;
 use crate::ZBase32Error;
 
 pub struct NeedOctets {
@@ -36,7 +36,7 @@ impl NeedOctets {
     ) -> Result<ProvideOctetResult, ZBase32Error> {
         if last_octet {
             if !octet_has_valid_trailing_bits(self.last_octet_bits, octet) {
-                return Err(trailing_nonzero_bits());
+                return Err(encoding_trailing_nonzero_bits().into());
             }
         }
 

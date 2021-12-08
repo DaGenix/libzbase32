@@ -2,7 +2,7 @@ use core::fmt::{Debug, Display, Formatter};
 
 enum InputErrorType {
     InvalidCharacter,
-    TrailingNonZeroBits,
+    DecodingTrailingNonzeroBits,
 }
 
 pub struct InputErrorCause {
@@ -13,8 +13,8 @@ impl Debug for InputErrorCause {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self.typ {
             InputErrorType::InvalidCharacter => write!(f, "Invalid character found in input."),
-            InputErrorType::TrailingNonZeroBits => {
-                write!(f, "Trailing non-zero bits found in input.")
+            InputErrorType::DecodingTrailingNonzeroBits => {
+                write!(f, "Trailing non-zero bits found in decode input.")
             }
         }
     }
@@ -31,6 +31,7 @@ enum UsageErrorType {
     OutputBufferDoesntMatchBits,
     BitsOverflow,
     InvalidQuintet,
+    EncodingTrailingNonzeroBits,
 }
 
 pub struct UsageErrorCause {
@@ -56,6 +57,14 @@ impl Debug for UsageErrorCause {
                 write!(f, "The value for bits was too large for the platform usize")
             }
             UsageErrorType::InvalidQuintet => write!(f, "Invalid quintet value found in input."),
+            UsageErrorType::EncodingTrailingNonzeroBits => {
+                write!(
+                    f,
+                    "Trailing non-zero bits found in data to encode. \
+                    Check that the value of the 'bits' parameter matches the data \
+                    to be encoded."
+                )
+            }
         }
     }
 }
@@ -141,9 +150,9 @@ pub const fn invalid_quintet() -> UsageError {
     })
 }
 
-pub const fn trailing_nonzero_bits() -> ZBase32Error {
+pub const fn decoding_trailing_nonzero_bits() -> ZBase32Error {
     ZBase32Error::InputError(InputErrorCause {
-        typ: InputErrorType::TrailingNonZeroBits,
+        typ: InputErrorType::DecodingTrailingNonzeroBits,
     })
 }
 
@@ -162,5 +171,11 @@ pub const fn output_buffer_doesnt_match_bits() -> UsageError {
 pub const fn bits_overflow() -> UsageError {
     UsageError(UsageErrorCause {
         typ: UsageErrorType::BitsOverflow,
+    })
+}
+
+pub const fn encoding_trailing_nonzero_bits() -> UsageError {
+    UsageError(UsageErrorCause {
+        typ: UsageErrorType::EncodingTrailingNonzeroBits,
     })
 }

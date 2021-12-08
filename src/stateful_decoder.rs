@@ -1,4 +1,4 @@
-use crate::error::{invalid_quintet, trailing_nonzero_bits};
+use crate::error::{decoding_trailing_nonzero_bits, invalid_quintet};
 use crate::ZBase32Error;
 
 pub struct NeedQuintets {
@@ -40,7 +40,7 @@ impl NeedQuintets {
 
         if last_quintet {
             if !quintet_has_valid_trailing_bits(self.last_quintet_bits, quintet) {
-                return Err(trailing_nonzero_bits());
+                return Err(decoding_trailing_nonzero_bits());
             }
         }
 
