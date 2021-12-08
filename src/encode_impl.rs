@@ -6,7 +6,7 @@ use crate::stateful_encoder::{
 };
 use crate::tables::QUINTET_TO_CHARACTER;
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
-use crate::{UsageError, ZBase32Error};
+use crate::UsageError;
 use core::iter::Peekable;
 
 enum OctetsToQuintetsIterState {
@@ -37,7 +37,7 @@ where
 fn refill<I>(
     octet_iter: &mut Peekable<I>,
     mut need_octets: NeedOctets,
-) -> Result<Option<OctetsToQuintetsIterState>, ZBase32Error>
+) -> Result<Option<OctetsToQuintetsIterState>, UsageError>
 where
     I: Iterator<Item = u8>,
 {
@@ -57,7 +57,7 @@ impl<I> Iterator for OctetsToQuintetsIter<I>
 where
     I: Iterator<Item = u8>,
 {
-    type Item = Result<u8, ZBase32Error>;
+    type Item = Result<u8, UsageError>;
 
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
         loop {
@@ -146,12 +146,12 @@ pub fn octets_to_quintets(
     in_octets: &[u8],
     out_quintets: &mut [u8],
     bits: u64,
-) -> Result<(), ZBase32Error> {
+) -> Result<(), UsageError> {
     if in_octets.len() != required_octets_buffer_len(bits)? {
-        return Err(input_buffer_doesnt_match_bits().into());
+        return Err(input_buffer_doesnt_match_bits());
     }
     if out_quintets.len() != required_quintets_buffer_len(bits)? {
-        return Err(output_buffer_doesnt_match_bits().into());
+        return Err(output_buffer_doesnt_match_bits());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
@@ -190,12 +190,12 @@ pub fn encode_slices(
     in_octets: &[u8],
     out_characters: &mut [u8],
     bits: u64,
-) -> Result<(), ZBase32Error> {
+) -> Result<(), UsageError> {
     if in_octets.len() != required_octets_buffer_len(bits)? {
-        return Err(input_buffer_doesnt_match_bits().into());
+        return Err(input_buffer_doesnt_match_bits());
     }
     if out_characters.len() != required_quintets_buffer_len(bits)? {
-        return Err(output_buffer_doesnt_match_bits().into());
+        return Err(output_buffer_doesnt_match_bits());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
@@ -225,9 +225,9 @@ pub fn encode_slices(
 ///
 /// This method is not available in `no_std` mode.
 #[cfg(feature = "std")]
-pub fn encode(input: &[u8], output: &mut String, bits: u64) -> Result<(), ZBase32Error> {
+pub fn encode(input: &[u8], output: &mut String, bits: u64) -> Result<(), UsageError> {
     if input.len() != required_octets_buffer_len(bits)? {
-        return Err(input_buffer_doesnt_match_bits().into());
+        return Err(input_buffer_doesnt_match_bits());
     }
     let last_octet_bits = if let Some(x) = calc_last_octet_bits(bits) {
         x
