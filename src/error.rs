@@ -2,7 +2,6 @@ use core::fmt::{Debug, Display, Formatter};
 
 enum InputErrorType {
     InvalidCharacter,
-    InvalidQuintet,
     TrailingNonZeroBits,
 }
 
@@ -14,7 +13,6 @@ impl Debug for InputErrorCause {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self.typ {
             InputErrorType::InvalidCharacter => write!(f, "Invalid character found in input."),
-            InputErrorType::InvalidQuintet => write!(f, "Invalid quintet value found in input."),
             InputErrorType::TrailingNonZeroBits => {
                 write!(f, "Trailing non-zero bits found in input.")
             }
@@ -32,6 +30,7 @@ enum UsageErrorType {
     InputBufferDoesntMatchBits,
     OutputBufferDoesntMatchBits,
     BitsOverflow,
+    InvalidQuintet,
 }
 
 pub struct UsageErrorCause {
@@ -56,6 +55,7 @@ impl Debug for UsageErrorCause {
             UsageErrorType::BitsOverflow => {
                 write!(f, "The value for bits was too large for the platform usize")
             }
+            UsageErrorType::InvalidQuintet => write!(f, "Invalid quintet value found in input."),
         }
     }
 }
@@ -135,9 +135,9 @@ pub const fn invalid_character() -> ZBase32Error {
     })
 }
 
-pub const fn invalid_quintet() -> ZBase32Error {
-    ZBase32Error::InputError(InputErrorCause {
-        typ: InputErrorType::InvalidQuintet,
+pub const fn invalid_quintet() -> UsageError {
+    UsageError(UsageErrorCause {
+        typ: UsageErrorType::InvalidQuintet,
     })
 }
 

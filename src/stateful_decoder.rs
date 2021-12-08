@@ -35,7 +35,7 @@ impl NeedQuintets {
         last_quintet: bool,
     ) -> Result<ProvideQuintetResult, ZBase32Error> {
         if quintet > 31 {
-            return Err(invalid_quintet());
+            return Err(invalid_quintet().into());
         }
 
         if last_quintet {

@@ -6,7 +6,7 @@ use crate::stateful_encoder::{
 };
 use crate::tables::QUINTET_TO_CHARACTER;
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
-use crate::ZBase32Error;
+use crate::{UsageError, ZBase32Error};
 use core::iter::Peekable;
 
 enum OctetsToQuintetsIterState {
@@ -110,7 +110,7 @@ where
 
 /// Convert a quintet integer value (such as "0") to its character
 /// value (such as "y").
-pub fn quintet_to_character(quintet: u8) -> Result<u8, ZBase32Error> {
+pub fn quintet_to_character(quintet: u8) -> Result<u8, UsageError> {
     if quintet as usize > QUINTET_TO_CHARACTER.len() {
         return Err(invalid_quintet());
     }
