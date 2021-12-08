@@ -1,5 +1,5 @@
 use crate::error::{decoding_trailing_nonzero_bits, invalid_quintet};
-use crate::ZBase32Error;
+use crate::InputError;
 
 pub struct NeedQuintets {
     quintet_buffer: [u8; 8],
@@ -33,7 +33,7 @@ impl NeedQuintets {
         mut self,
         quintet: u8,
         last_quintet: bool,
-    ) -> Result<ProvideQuintetResult, ZBase32Error> {
+    ) -> Result<ProvideQuintetResult, InputError> {
         if quintet > 31 {
             return Err(invalid_quintet().into());
         }

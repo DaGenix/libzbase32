@@ -7,7 +7,7 @@ use crate::stateful_decoder::{
 };
 use crate::tables::{CHARACTER_MIN_VALUE, CHARACTER_TO_QUINTET};
 use crate::util::{required_octets_buffer_len, required_quintets_buffer_len};
-use crate::ZBase32Error;
+use crate::InputError;
 use core::iter::Peekable;
 
 enum QuintetsToOctetsIterState {
@@ -17,7 +17,7 @@ enum QuintetsToOctetsIterState {
 
 struct QuintetsToOctetsIter<I>
 where
-    I: Iterator<Item = Result<u8, ZBase32Error>>,
+    I: Iterator<Item = Result<u8, InputError>>,
 {
     quintet_iter: Peekable<I>,
     state: Option<QuintetsToOctetsIterState>,
@@ -25,7 +25,7 @@ where
 
 impl<I> QuintetsToOctetsIter<I>
 where
-    I: Iterator<Item = Result<u8, ZBase32Error>>,
+    I: Iterator<Item = Result<u8, InputError>>,
 {
     fn new(quintet_iter: I, need_quintets: NeedQuintets) -> QuintetsToOctetsIter<I> {
         QuintetsToOctetsIter {
@@ -38,9 +38,9 @@ where
 fn refill<I>(
     quintet_iter: &mut Peekable<I>,
     mut need_quintets: NeedQuintets,
-) -> Result<Option<QuintetsToOctetsIterState>, ZBase32Error>
+) -> Result<Option<QuintetsToOctetsIterState>, InputError>
 where
-    I: Iterator<Item = Result<u8, ZBase32Error>>,
+    I: Iterator<Item = Result<u8, InputError>>,
 {
     loop {
         let quintet = quintet_iter.next().unwrap()?;
@@ -56,9 +56,9 @@ where
 
 impl<I> Iterator for QuintetsToOctetsIter<I>
 where
-    I: Iterator<Item = Result<u8, ZBase32Error>>,
+    I: Iterator<Item = Result<u8, InputError>>,
 {
-    type Item = Result<u8, ZBase32Error>;
+    type Item = Result<u8, InputError>;
 
     fn next(&mut self) -> Option<<Self as Iterator>::Item> {
         loop {
@@ -110,7 +110,7 @@ where
 
 /// Convert a character code value (such as "y") to its integer
 /// value (such as 0).
-pub fn character_to_quintet(character: u8) -> Result<u8, ZBase32Error> {
+pub fn character_to_quintet(character: u8) -> Result<u8, InputError> {
     if character < CHARACTER_MIN_VALUE {
         return Err(invalid_character());
     } else if (character - CHARACTER_MIN_VALUE) as usize >= CHARACTER_TO_QUINTET.len() {
@@ -153,7 +153,7 @@ pub fn quintets_to_octets(
     in_quintets: &[u8],
     out_octets: &mut [u8],
     bits: u64,
-) -> Result<(), ZBase32Error> {
+) -> Result<(), InputError> {
     if in_quintets.len() != required_quintets_buffer_len(bits)? {
         return Err(input_buffer_doesnt_match_bits().into());
     }
@@ -197,7 +197,7 @@ pub fn decode_slices(
     in_characters: &[u8],
     out_octets: &mut [u8],
     bits: u64,
-) -> Result<(), ZBase32Error> {
+) -> Result<(), InputError> {
     if in_characters.len() != required_quintets_buffer_len(bits)? {
         return Err(input_buffer_doesnt_match_bits().into());
     }
@@ -232,7 +232,7 @@ pub fn decode_slices(
 ///
 /// This method is not available in `no_std` mode.
 #[cfg(feature = "std")]
-pub fn decode(input: &str, output: &mut Vec<u8>, bits: u64) -> Result<(), ZBase32Error> {
+pub fn decode(input: &str, output: &mut Vec<u8>, bits: u64) -> Result<(), InputError> {
     if input.len() != required_quintets_buffer_len(bits)? {
         return Err(input_buffer_doesnt_match_bits().into());
     }

@@ -41,7 +41,7 @@
 //! the number of bits specified in the operation, an Error be returned. For example,
 //! encoding a single bit for the input value 0x01 will fail.
 //!
-//! Most fallible operations return an Error value of the same type, [`ZBase32Error`].
+//! Most fallible operations return an Error value of the same type, [`InputError`].
 //! This is a mostly opaque type that only allows you to differentiate between an
 //! error in the input value or an error in using the interfaces. More information
 //! about the cause of the error can be retrieved by using the
@@ -56,7 +56,7 @@
 //! Example:
 //!
 //! ```
-//! use libzbase32::{ZBase32Error, encode, decode};
+//! use libzbase32::{InputError, encode, decode};
 //!
 //! # fn main() {
 //! const DATA: &'static [u8] = &[0, 44, 55, 128];
@@ -124,7 +124,7 @@ mod tables;
 mod test_data;
 mod util;
 
-pub use error::{InputErrorCause, UsageError, UsageErrorCause, ZBase32Error};
+pub use error::{InputError, InputErrorCause, UsageError, UsageErrorCause};
 
 #[cfg(feature = "std")]
 pub use decode_impl::decode;

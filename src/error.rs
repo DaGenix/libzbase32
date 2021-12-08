@@ -82,7 +82,7 @@ impl Display for UsageErrorCause {
 /// data and other types of errors. The [`Debug`] or [`Display`]
 /// implementations can be used to format a more specific error
 /// message.
-pub enum ZBase32Error {
+pub enum InputError {
     /// An InputError indicates that an input array contained an invalid
     /// value. For example, a non-zbase32 character being passed to one of
     /// the decode methods.
@@ -92,27 +92,27 @@ pub enum ZBase32Error {
     UsageError(UsageErrorCause),
 }
 
-impl Debug for ZBase32Error {
+impl Debug for InputError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            ZBase32Error::InputError(cause) => write!(f, "Input Error: {}", cause),
-            ZBase32Error::UsageError(cause) => write!(f, "Usage Error: {}", cause),
+            InputError::InputError(cause) => write!(f, "Input Error: {}", cause),
+            InputError::UsageError(cause) => write!(f, "Usage Error: {}", cause),
         }
     }
 }
 
-impl Display for ZBase32Error {
+impl Display for InputError {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         Debug::fmt(self, f)
     }
 }
 
 #[cfg(feature = "std")]
-impl std::error::Error for ZBase32Error {}
+impl std::error::Error for InputError {}
 
-impl From<UsageError> for ZBase32Error {
+impl From<UsageError> for InputError {
     fn from(err: UsageError) -> Self {
-        ZBase32Error::UsageError(err.0)
+        InputError::UsageError(err.0)
     }
 }
 
@@ -138,8 +138,8 @@ impl Display for UsageError {
 #[cfg(feature = "std")]
 impl std::error::Error for UsageError {}
 
-pub const fn invalid_character() -> ZBase32Error {
-    ZBase32Error::InputError(InputErrorCause {
+pub const fn invalid_character() -> InputError {
+    InputError::InputError(InputErrorCause {
         typ: InputErrorType::InvalidCharacter,
     })
 }
@@ -150,8 +150,8 @@ pub const fn invalid_quintet() -> UsageError {
     })
 }
 
-pub const fn decoding_trailing_nonzero_bits() -> ZBase32Error {
-    ZBase32Error::InputError(InputErrorCause {
+pub const fn decoding_trailing_nonzero_bits() -> InputError {
+    InputError::InputError(InputErrorCause {
         typ: InputErrorType::DecodingTrailingNonzeroBits,
     })
 }
