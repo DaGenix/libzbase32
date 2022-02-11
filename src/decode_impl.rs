@@ -263,6 +263,8 @@ pub fn decode(input: &str, output: &mut Vec<u8>, bits: u64) -> Result<(), ZBase3
 mod tests {
     #[cfg(feature = "std")]
     use super::decode;
+    use super::decode_slices;
+    use super::required_octets_buffer_len;
     use crate::test_data::{TestCase, RANDOM_TEST_DATA, STANDARD_TEST_DATA};
 
     #[cfg(feature = "std")]
@@ -272,6 +274,16 @@ mod tests {
             buffer.clear();
             decode(test.encoded, &mut buffer, test.bits).unwrap();
             assert_eq!(&buffer[..], test.unencoded);
+        }
+    }
+
+    fn run_low_level_tests(test_cases: &[TestCase]) {
+        // the largest sample in src/test_data.rs has 128 bits.
+        let mut buffer: [u8; 256] = [0; 256];
+        for test in test_cases {
+            let outsz:usize = required_octets_buffer_len(test.bits).unwrap();
+            decode_slices(test.encoded.as_bytes(), &mut buffer[..outsz], test.bits).unwrap();
+            assert_eq!(&buffer[..outsz], test.unencoded);
         }
     }
 
@@ -285,5 +297,15 @@ mod tests {
     #[cfg(feature = "std")]
     fn test_decode_random() {
         run_tests(RANDOM_TEST_DATA);
+    }
+
+    #[test]
+    fn test_decode_low_level_standard() {
+        run_low_level_tests(STANDARD_TEST_DATA);
+    }
+
+    #[test]
+    fn test_decode_low_level_random() {
+        run_low_level_tests(RANDOM_TEST_DATA);
     }
 }
