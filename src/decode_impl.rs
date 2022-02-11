@@ -261,9 +261,11 @@ pub fn decode(input: &str, output: &mut Vec<u8>, bits: u64) -> Result<(), ZBase3
 
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "std")]
     use super::decode;
     use crate::test_data::{TestCase, RANDOM_TEST_DATA, STANDARD_TEST_DATA};
 
+    #[cfg(feature = "std")]
     fn run_tests(test_cases: &[TestCase]) {
         let mut buffer = Vec::new();
         for test in test_cases {
@@ -274,11 +276,13 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_decode_standard() {
         run_tests(STANDARD_TEST_DATA);
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_decode_random() {
         run_tests(RANDOM_TEST_DATA);
     }
