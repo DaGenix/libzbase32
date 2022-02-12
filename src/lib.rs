@@ -51,13 +51,14 @@
 //! ## High-level API
 //!
 //! The high-level API consists of two encoding functions
-//! [`encode_full_bytes`] and [`encode`]; and a decoding function
-//! [`decode`].
+//! [`encode_full_bytes`] and [`encode`]; and two decoding functions
+//! [`decode_full_bytes`] and [`decode`].
 //!
-//! [`encode_full_bytes`] is simple to use when you know that you have
-//! a whole number of bytes to encode and you want to produce a new
-//! String.  [`encode`] can handle numbers of bits that are not
-//! divisible by 8, and can also append to an existing String.
+//! [`encode_full_bytes`] and [`decode_full_bytes`] are simple to use
+//! when you know that the unencoded bytestring is a whole number of
+//! bytes.  [`encode`] and [`decode`] can also handle numbers of
+//! unencoded bits that are not divisible by 8, and can also append
+//! their results to existing variables.
 //!
 //! Example:
 //!
@@ -69,6 +70,9 @@
 //!
 //! let full_bytes_encoded = encode_full_bytes(DATA);
 //! assert_eq!(&full_bytes_encoded, "yysdxyy");
+//!
+//! let full_bytes_decoded = decode_full_bytes(full_bytes_encoded);
+//! assert_eq!(&full_bytes_decoded, DATA);
 //!
 //! let mut encoded = String::new();
 //! encode(DATA, &mut encoded, 25).expect("Encoding failed!");
