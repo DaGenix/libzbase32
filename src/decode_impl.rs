@@ -308,4 +308,32 @@ mod tests {
     fn test_decode_low_level_random() {
         run_low_level_tests(RANDOM_TEST_DATA);
     }
+
+    #[test]
+    fn test_decode_non_zbase32_characters() {
+        let badcharacters = [ "0", "L", "💩", " ", "!", "_", "2", "v"];
+        let mut out:[u8; 1] = [0];
+        for character in badcharacters {
+            assert!(decode_slices(character.as_bytes(), &mut out, 5).is_err(),
+                    "'{}' is not valid zbase32 character", character);
+        }
+    }
+
+    #[test]
+    fn test_decode_non_full_byte_strings() {
+        // Should really also test different length encodings and bit
+        // boundaries, not just two chars in, one octet out. But it's
+        // clumsy to do this in no_std (without allocation), so just a
+        // simple test for now.
+
+        // these two-character strings have some bits set in the
+        // trailing bits after the last full octet:
+        let badstrings = [ "99", "y9", "on", "yt", "zb"];
+        let mut out:[u8;1] = [0];
+        for string in badstrings {
+            assert!(decode_slices(string.as_bytes(), &mut out, 8).is_err(),
+                    "'{}' should have produced bits beyond bit 8, should not have decoded, got {:#?}",
+                    string, out);
+        }
+    }
 }
