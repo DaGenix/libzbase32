@@ -248,11 +248,38 @@ pub fn encode(input: &[u8], output: &mut String, bits: u64) -> Result<(), ZBase3
     Ok(())
 }
 
+/// Encode a whole number of octets (bytes) to a [`String`].
+///
+/// If you need a number of bits that is not a multiple of 8 (that is,
+/// not a whole number of bytes), or you need to append to an existing
+/// string, use [`encode`] instead.
+///
+/// This method is not available in `no_std` mode.
+#[cfg(feature = "std")]
+pub fn encode_full_bytes(input: &[u8]) -> String {
+    let mut output = String::from("");
+    encode(input, &mut output, input.len() as u64 * 8).unwrap();
+    output
+}
+
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "std")]
     use super::encode;
+    #[cfg(feature = "std")]
+    use super::encode_full_bytes;
     use crate::test_data::{TestCase, RANDOM_TEST_DATA, STANDARD_TEST_DATA};
 
+    #[cfg(feature = "std")]
+    fn run_full_bytes_tests(test_cases: &[TestCase]) {
+        for test in test_cases {
+            if (test.bits % 8) == 0 {
+                assert_eq!(String::from(test.encoded), encode_full_bytes(test.unencoded));
+            }
+        }
+    }
+    
+    #[cfg(feature = "std")]
     fn run_tests(test_cases: &[TestCase]) {
         let mut buffer = String::new();
         for test in test_cases {
@@ -263,12 +290,26 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_encode_standard() {
         run_tests(STANDARD_TEST_DATA);
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_encode_random() {
         run_tests(RANDOM_TEST_DATA);
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_encode_full_bytes_standard() {
+        run_full_bytes_tests(STANDARD_TEST_DATA);
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_encode_full_bytes_random() {
+        run_full_bytes_tests(RANDOM_TEST_DATA);
     }
 }

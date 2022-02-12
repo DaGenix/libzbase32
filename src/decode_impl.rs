@@ -259,11 +259,40 @@ pub fn decode(input: &str, output: &mut Vec<u8>, bits: u64) -> Result<(), ZBase3
     Ok(())
 }
 
+/// Decode a slice of characters to a [`Vec`] of octets (bytes).
+///
+/// It decodes to the longest full octet string, and fails if any
+/// left-over bits from the encoded form are non-zero.
+///
+/// This method is not available in `no_std` mode.
+#[cfg(feature = "std")]
+pub fn decode_full_bytes(input: &str) -> Result<Vec<u8>, ZBase32Error> {
+    let bits:u64 = ((input.len() as u64 *5)/8)*8;
+    let mut output:Vec<u8> = Vec::new();
+    match decode(input, &mut output, bits) {
+        Ok(_) => Ok(output),
+        Err(e) => Err(e),
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    #[cfg(feature = "std")]
     use super::decode;
+    #[cfg(feature = "std")]
+    use super::decode_full_bytes;
     use crate::test_data::{TestCase, RANDOM_TEST_DATA, STANDARD_TEST_DATA};
 
+    #[cfg(feature = "std")]
+    fn run_full_bytes_tests(test_cases: &[TestCase]) {
+        for test in test_cases {
+            if (test.bits % 8) == 0 {
+                assert_eq!(test.unencoded, decode_full_bytes(test.encoded).unwrap());
+            }
+        }
+    }
+
+    #[cfg(feature = "std")]
     fn run_tests(test_cases: &[TestCase]) {
         let mut buffer = Vec::new();
         for test in test_cases {
@@ -274,12 +303,26 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_decode_standard() {
         run_tests(STANDARD_TEST_DATA);
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_decode_random() {
         run_tests(RANDOM_TEST_DATA);
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_decode_full_bytes_standard() {
+        run_full_bytes_tests(STANDARD_TEST_DATA);
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn test_decode_full_bytes_random() {
+        run_full_bytes_tests(RANDOM_TEST_DATA);
     }
 }
