@@ -50,16 +50,25 @@
 //!
 //! ## High-level API
 //!
-//! The high-level API consists of the functions [`encode`] and
-//! its reverse, [`decode`].
+//! The high-level API consists of two encoding functions
+//! [`encode_full_bytes`] and [`encode`]; and a decoding function
+//! [`decode`].
+//!
+//! [`encode_full_bytes`] is simple to use when you know that you have
+//! a whole number of bytes to encode and you want to produce a new
+//! String.  [`encode`] can handle numbers of bits that are not
+//! divisible by 8, and can also append to an existing String.
 //!
 //! Example:
 //!
 //! ```
-//! use libzbase32::{ZBase32Error, encode, decode};
+//! use libzbase32::{ZBase32Error, encode, encode_full_bytes, decode};
 //!
 //! # fn main() {
 //! const DATA: &'static [u8] = &[0, 44, 55, 128];
+//!
+//! let full_bytes_encoded = encode_full_bytes(DATA);
+//! assert_eq!(&full_bytes_encoded, "yysdxyy");
 //!
 //! let mut encoded = String::new();
 //! encode(DATA, &mut encoded, 25).expect("Encoding failed!");
