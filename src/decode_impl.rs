@@ -270,6 +270,14 @@ mod tests {
             buffer.clear();
             decode(test.encoded, &mut buffer, test.bits).unwrap();
             assert_eq!(&buffer[..], test.unencoded);
+            buffer = Vec::new();
+            decode(test.encoded.replace("z", "2").as_str(), &mut buffer, test.bits).unwrap();
+            assert_eq!(&buffer[..], test.unencoded,
+                       "failed to decode when 2 replaces z: {} (got: {:?})", test.encoded, buffer);
+            buffer = Vec::new();
+            decode(test.encoded.replace("o", "0").as_str(), &mut buffer, test.bits).unwrap();
+            assert_eq!(&buffer[..], test.unencoded,
+                       "failed to decode when 0 replaces o: {} (got: {:?})", test.encoded, buffer);
         }
     }
 

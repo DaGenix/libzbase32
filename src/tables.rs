@@ -1,9 +1,11 @@
 // Maps from character code to their value in the z-base-32 scheme
-// Table starts from character code 49 ('1')
-pub const CHARACTER_MIN_VALUE: u8 = 49;
+// Table starts from character code 48 ('0')
+pub const CHARACTER_MIN_VALUE: u8 = 48;
 pub const CHARACTER_TO_QUINTET: &'static [u8] = &[
+    16, // '0' (misread of 'O')
     18, // '1'
-    255, 25, // '3'
+    23, // '2' (misread of 'Z')
+    25, // '3'
     26, // '4'
     27, // '5'
     30, // '6'
